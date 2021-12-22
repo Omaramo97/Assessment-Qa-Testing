@@ -18,6 +18,7 @@ rollbar.log('Hello world!')
 
 app.use(express.json())
 
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '/public/index.html'))
     rollbar.info('HTML file served successfully')
@@ -33,10 +34,11 @@ app.get('/js', (req, res) => {
 
 app.get('/api/robots', (req, res) => {
     try {
-        rollbar.info('Someone got the array of robots!')
+        rollbar.error('Array does not show')
         res.status(200).send(botsArr)
     } catch (error) {
         console.log('ERROR GETTING BOTS', error)
+        rollbar.error('Bots not showing for user')
         res.sendStatus(400)
     }
 })
@@ -46,7 +48,7 @@ app.get('/api/robots/five', (req, res) => {
         let shuffled = shuffleArray(bots)
         let choices = shuffled.slice(0, 5)
         let compDuo = shuffled.slice(6, 8)
-        rollbar.log('Bots array shuffled', {author: 'Omar', type: 'manual entry'})
+        rollbar.info('Bots array shuffled', {author: 'Omar', type: 'manual entry'})
         res.status(200).send({choices, compDuo})
     } catch (error) {
         console.log('ERROR GETTING FIVE BOTS', error)
@@ -78,7 +80,7 @@ app.post('/api/duel', (req, res) => {
             res.status(200).send('You lost!')
         } else {
             playerRecord.losses++
-            rollbar.info('Nice, you won! RNG is on your side. User Won')
+            rollbar.log('Nice, you won! RNG is on your side. User Won')
             res.status(200).send('You won!')
         }
     } catch (error) {
@@ -96,6 +98,7 @@ app.get('/api/player', (req, res) => {
         res.sendStatus(400)
     }
 })
+app.use(rollbar.errorHandler())
 
 const port = process.env.PORT || 3000
 
